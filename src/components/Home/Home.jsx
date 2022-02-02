@@ -1,8 +1,21 @@
-import { Table, InputNumber } from 'antd';
+import { Table, InputNumber, Modal } from 'antd';
 import { useState, useEffect, useCallback } from 'react';
 
 export const Home = () => {
 	const [dataSource, setDataSource] = useState([]);
+	const [detailModal, setDetailModal] = useState(null);
+
+	const showModal = (rowData) => {
+		setDetailModal(rowData);
+	};
+
+	const handleOk = () => {
+		setDetailModal(null);
+	};
+
+	const handleCancel = () => {
+		setDetailModal(null);
+	};
 
 	const parseData = useCallback((data) => {
 		const modifiedData = data.map((ticket) => {
@@ -14,6 +27,7 @@ export const Home = () => {
 				releaseDate: ticket.releaseDate,
 				price: ticket.price,
 				units: 0,
+				description: ticket.description,
 			};
 
 			return ticketObject;
@@ -52,6 +66,9 @@ export const Home = () => {
 			title: 'Name',
 			dataIndex: 'name',
 			key: 'name',
+			render: (value, rowData) => (
+				<span onClick={() => showModal(rowData)}>{value}</span>
+			),
 		},
 		{
 			title: 'Type',
@@ -92,6 +109,17 @@ export const Home = () => {
 	return (
 		<>
 			<Table dataSource={dataSource} columns={columns} pagination={false} />
+			<Modal
+				title={detailModal?.name}
+				visible={detailModal !== null}
+				onOk={handleOk}
+				onCancel={handleCancel}
+			>
+				<h3>Type: </h3>
+				<p>{detailModal?.type}</p>
+				<h3>Description: </h3>
+				<p>{detailModal?.description}</p>
+			</Modal>
 		</>
 	);
 };
