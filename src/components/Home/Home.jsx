@@ -54,9 +54,7 @@ export const Home = () => {
 		const elementIndex = dataCopy.findIndex((el) => el.id === rowData.id);
 
 		if (elementIndex > -1) {
-			// actualiza valor de units
 			dataCopy[elementIndex].units = value;
-			// luego de modificar los datos como los necesitamos actualizamos dataSource
 			setDataSource(dataCopy);
 		}
 	};
