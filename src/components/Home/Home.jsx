@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 export const Home = () => {
 	const [dataSource, setDataSource] = useState([]);
 
-	const parseData = (data) => {
+	const parseData = useCallback((data) => {
 		const modifiedData = data.map((ticket) => {
 			const ticketObject = {
 				id: ticket.id,
@@ -20,24 +20,31 @@ export const Home = () => {
 		});
 
 		return modifiedData;
-	};
+	}, []);
+
 	const fetchData = useCallback(async () => {
 		const request = await fetch(
 			'https://my-json-server.typicode.com/davidan90/demo/tickets'
 		);
 		const response = await request.json();
-		const result = parseData(response); // [{id, name, date, units, etc}]
+		const result = parseData(response);
 		setDataSource(result);
 	}, []);
 
 	useEffect(() => {
 		fetchData();
-		// const result = parseData(dataSource); // [{id, name, date, units, etc}]
-		// setDataSource(result);
 	}, [fetchData]);
 
-	const handleOnChange = (value) => {
-		console.log('Onchange', value);
+	const handleOnChange = (value, rowData) => {
+		const dataCopy = [...dataSource];
+		const elementIndex = dataCopy.findIndex((el) => el.id === rowData.id);
+
+		if (elementIndex > -1) {
+			// actualiza valor de units
+			dataCopy[elementIndex].units = value;
+			// luego de modificar los datos como los necesitamos actualizamos dataSource
+			setDataSource(dataCopy);
+		}
 	};
 
 	const columns = [
@@ -62,13 +69,13 @@ export const Home = () => {
 			title: 'Unit Selector',
 			dataIndex: 'units',
 			key: 'units',
-			render: (units) => {
+			render: (units, rowData) => {
 				return (
 					<InputNumber
 						min={0}
 						max={20}
 						defaultValue={units}
-						onChange={handleOnChange}
+						onChange={(value) => handleOnChange(value, rowData)}
 					/>
 				);
 			},
@@ -79,6 +86,8 @@ export const Home = () => {
 			key: 'price',
 		},
 	];
+
+	console.log({ dataSource });
 
 	return (
 		<>
