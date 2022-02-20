@@ -16,4 +16,4 @@
 - Motramos datos en el modal.
 
 -sitio estatico
-https://sentisis-test.netlify.app/
+<https://sentisis-test.netlify.app/>

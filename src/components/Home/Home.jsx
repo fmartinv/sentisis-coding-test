@@ -43,7 +43,7 @@ export const Home = () => {
 		const response = await request.json();
 		const result = parseData(response);
 		setDataSource(result);
-	}, []);
+	}, [parseData]);
 
 	useEffect(() => {
 		fetchData();
