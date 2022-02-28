@@ -1,20 +1,29 @@
-import { Table, InputNumber, Modal } from 'antd';
-import { useState, useEffect, useCallback } from 'react';
-
+import { Table, InputNumber } from 'antd';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { DetailModal } from '../DetailModal/DetailModal';
 export const Home = () => {
 	const [dataSource, setDataSource] = useState([]);
 	const [detailModal, setDetailModal] = useState(null);
+	const activeRow = useRef(null);
 
-	const showModal = (rowData) => {
+	const showModal = (rowData, i) => {
+		activeRow.current = i;
 		setDetailModal(rowData);
 	};
 
-	const handleOk = () => {
+	const handleCancel = () => {
+		activeRow.current = null;
 		setDetailModal(null);
 	};
 
-	const handleCancel = () => {
-		setDetailModal(null);
+	const handleOk = (row) => {
+		//Making a state copy to update data.
+		const dataSourceCopy = [...dataSource];
+		const i = activeRow.current;
+		dataSourceCopy[i] = row;
+		console.log(dataSourceCopy);
+		setDataSource(dataSourceCopy);
+		handleCancel();
 	};
 
 	const parseData = useCallback((data) => {
@@ -49,23 +58,26 @@ export const Home = () => {
 		fetchData();
 	}, [fetchData]);
 
-	const handleOnChange = (value, rowData) => {
-		const dataCopy = [...dataSource];
-		const elementIndex = dataCopy.findIndex((el) => el.id === rowData.id);
+	const handleOnChange = useCallback(
+		(value, rowData) => {
+			const dataCopy = [...dataSource];
+			const elementIndex = dataCopy.findIndex((el) => el.id === rowData.id);
 
-		if (elementIndex > -1) {
-			dataCopy[elementIndex].units = value;
-			setDataSource(dataCopy);
-		}
-	};
+			if (elementIndex > -1) {
+				dataCopy[elementIndex].units = value;
+				setDataSource(dataCopy);
+			}
+		},
+		[dataSource]
+	);
 
 	const columns = [
 		{
 			title: 'Name',
 			dataIndex: 'name',
 			key: 'name',
-			render: (value, rowData) => (
-				<span onClick={() => showModal(rowData)}>{value}</span>
+			render: (value, rowData, i) => (
+				<span onClick={() => showModal(rowData, i)}>{value}</span>
 			),
 		},
 		{
@@ -84,16 +96,15 @@ export const Home = () => {
 			title: 'Unit Selector',
 			dataIndex: 'units',
 			key: 'units',
-			render: (units, rowData) => {
-				return (
-					<InputNumber
-						min={0}
-						max={20}
-						defaultValue={units}
-						onChange={(value) => handleOnChange(value, rowData)}
-					/>
-				);
-			},
+			render: (units, rowData) => (
+				<InputNumber
+					min={0}
+					max={20}
+					value={units}
+					defaultValue={units}
+					onChange={(value) => handleOnChange(value, rowData)}
+				/>
+			),
 		},
 		{
 			title: 'Price',
@@ -102,22 +113,14 @@ export const Home = () => {
 		},
 	];
 
-	console.log({ dataSource });
-
 	return (
 		<>
 			<Table dataSource={dataSource} columns={columns} pagination={false} />
-			<Modal
-				title={detailModal?.name}
-				visible={detailModal !== null}
-				onOk={handleOk}
+			<DetailModal
+				data={detailModal}
 				onCancel={handleCancel}
-			>
-				<h3>Type: </h3>
-				<p>{detailModal?.type}</p>
-				<h3>Description: </h3>
-				<p>{detailModal?.description}</p>
-			</Modal>
+				onAdd={(row) => handleOk(row)}
+			/>
 		</>
 	);
 };

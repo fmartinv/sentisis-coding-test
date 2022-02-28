@@ -11,7 +11,7 @@
 - optimizacion de function fetch con useCallback
 - implentacion de input number en tabla.
 - implementacion de onChange en input de tabla.
-- HandleOnchange actualizar el valor de imput mediante parametro 'unit'y generar un nuevo registro en un array 'datcopy'
+- HandleOnchange actualizar el valor de imput mediante parametro 'unit'y generar un nuevo registro en un array 'datacopy'
 - Implementación del modal desde libreria Ant design.
 - Motramos datos en el modal.
 
